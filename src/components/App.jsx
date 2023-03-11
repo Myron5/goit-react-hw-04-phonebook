@@ -15,13 +15,8 @@ import {
 } from '../utils';
 
 export const App = () => {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState(getLSContacts);
   const [filter, setFilter] = useState('');
-
-  useEffect(() => {
-    const lsContacts = getLSContacts();
-    setContacts(lsContacts);
-  }, []);
 
   const handleOnFilterChange = e => {
     const { value } = e.target;
