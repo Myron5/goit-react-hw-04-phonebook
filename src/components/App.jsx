@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { BsFillTelephoneFill } from 'react-icons/bs';
 
 import { AppBox, Section, FlexBox, RightBox } from './GeneralContainers';
@@ -8,50 +8,33 @@ import { Filter } from './Filter/Filter';
 
 import {
   uniqueId,
-  checkOnInclude,
   isInContactsNumber,
   isInContactsName,
   getLSContacts,
   setLSContacts,
 } from '../utils';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
+export const App = () => {
+  const [contacts, setContacts] = useState([]);
+  const [filter, setFilter] = useState('');
 
-  componentDidMount() {
-    const contacts = getLSContacts();
-    this.setState({ contacts });
-  }
+  useEffect(() => {
+    const lsContacts = getLSContacts();
+    setContacts(lsContacts);
+  }, []);
 
-  filterFunc = (contacts, value) => {
-    return !value
-      ? contacts
-      : contacts.filter(
-          ({ name, number }) =>
-            checkOnInclude(name, value) || checkOnInclude(number, value)
-        );
-  };
-
-  handleOnFilterChange = e => {
+  const handleOnFilterChange = e => {
     const { value } = e.target;
-
-    this.setState({
-      filter: value,
-    });
+    setFilter(value);
   };
 
-  handleOnDelete = idArg => {
-    const { contacts } = this.state;
+  const handleOnDelete = idArg => {
     const newContacts = contacts.filter(({ id }) => idArg !== id);
-    this.setState({ contacts: newContacts });
+    setContacts(newContacts);
     setLSContacts(newContacts);
   };
 
-  handleOnSubmit = ({ name, number }, { resetForm }) => {
-    const { contacts } = this.state;
+  const handleOnSubmit = ({ name, number }, { resetForm }) => {
     const id = uniqueId(contacts);
 
     try {
@@ -61,7 +44,7 @@ export class App extends Component {
         throw new Error(`Number "${number}" is already in your contacts`);
 
       const newContacts = [...contacts, { id, name, number }];
-      this.setState({ contacts: newContacts });
+      setContacts(newContacts);
       setLSContacts(newContacts);
       resetForm();
     } catch (err) {
@@ -69,29 +52,26 @@ export class App extends Component {
     }
   };
 
-  render = () => {
-    return (
-      <AppBox>
-        <Section title="Phonebook" icon={<BsFillTelephoneFill />}>
-          <FlexBox>
-            <ContactForm handleOnSubmit={this.handleOnSubmit}></ContactForm>
+  return (
+    <AppBox>
+      <Section title="Phonebook" icon={<BsFillTelephoneFill />}>
+        <FlexBox>
+          <ContactForm onSubmit={handleOnSubmit}></ContactForm>
 
-            <RightBox>
-              <Filter
-                title="Contacts"
-                handleOnChange={this.handleOnFilterChange}
-                filterValue={this.state.filter}
-              ></Filter>
-              <ContactList
-                contacts={this.state.contacts}
-                filterValue={this.state.filter}
-                filterFunc={this.filterFunc}
-                handleOnDelete={this.handleOnDelete}
-              ></ContactList>
-            </RightBox>
-          </FlexBox>
-        </Section>
-      </AppBox>
-    );
-  };
-}
+          <RightBox>
+            <Filter
+              title="Contacts"
+              onChange={handleOnFilterChange}
+              value={filter}
+            ></Filter>
+            <ContactList
+              contacts={contacts}
+              value={filter}
+              onDelete={handleOnDelete}
+            ></ContactList>
+          </RightBox>
+        </FlexBox>
+      </Section>
+    </AppBox>
+  );
+};

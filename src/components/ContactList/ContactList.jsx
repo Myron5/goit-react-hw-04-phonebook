@@ -1,22 +1,27 @@
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Ul, Li, Name, Button } from './ContactList.styled';
+import { checkOnInclude } from '../../utils';
 
-export const ContactList = ({
-  contacts,
-  filterValue,
-  filterFunc,
-  handleOnDelete,
-}) => {
-  const filterContacts = filterFunc(contacts, filterValue);
+export const ContactList = ({ contacts, value, onDelete }) => {
+  const filteredContacts = useMemo(() => {
+    return !value
+      ? contacts
+      : contacts.filter(
+          ({ name, number }) =>
+            checkOnInclude(name, value) || checkOnInclude(number, value)
+        );
+  }, [contacts, value]);
+
   return (
     <div>
       <Ul>
-        {filterContacts.map(({ id, name, number }) => (
+        {filteredContacts.map(({ id, name, number }) => (
           <Li key={id}>
             <Name>
               {name} : <span>{number}</span>
             </Name>
-            <Button type="button" onClick={() => handleOnDelete(id)}>
+            <Button type="button" onClick={() => onDelete(id)}>
               Delete
             </Button>
           </Li>
@@ -34,7 +39,6 @@ ContactList.propTypes = {
       number: PropTypes.string.isRequired,
     })
   ),
-  filterValue: PropTypes.string.isRequired,
-  filterFunc: PropTypes.func.isRequired,
-  handleOnDelete: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };

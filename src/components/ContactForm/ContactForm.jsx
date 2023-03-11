@@ -12,24 +12,24 @@ import {
 } from './ContactForm.styled';
 import { phoneRegExp } from '../../constants';
 
-const initialValues = {
-  name: '',
-  number: '',
-};
+export const ContactForm = ({ onSubmit }) => {
+  const initialValues = {
+    name: '',
+    number: '',
+  };
 
-const schema = yup.object().shape({
-  name: yup.string().max(50).required(),
-  number: yup
-    .string()
-    .required()
-    .matches(phoneRegExp, 'Phone number is not valid'),
-});
+  const schema = yup.object().shape({
+    name: yup.string().max(50).required(),
+    number: yup
+      .string()
+      .required()
+      .matches(phoneRegExp, 'Phone number is not valid'),
+  });
 
-export const ContactForm = ({ handleOnSubmit }) => {
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={handleOnSubmit}
+      onSubmit={onSubmit}
       validationSchema={schema}
     >
       {({ values }) => (
@@ -52,5 +52,5 @@ export const ContactForm = ({ handleOnSubmit }) => {
 };
 
 ContactForm.propTypes = {
-  handleOnSubmit: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
